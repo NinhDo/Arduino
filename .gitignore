@@ -62,6 +62,9 @@ dlldata.c
 *.pidb
 *.svclog
 *.scc
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
 
 # Chutzpah Test files
 _Chutzpah*
@@ -194,3 +197,4 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+DC_Motor/DC_Motor.vcxproj
