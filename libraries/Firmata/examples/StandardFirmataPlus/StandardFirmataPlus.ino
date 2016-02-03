@@ -20,7 +20,7 @@
 
   See file LICENSE.txt for further informations on licensing terms.
 
-  Last updated by Jeff Hoefs: November 7th, 2015
+  Last updated by Jeff Hoefs: December 26th, 2015
 */
 
 /*
@@ -45,10 +45,10 @@
 #include <Wire.h>
 #include <Firmata.h>
 
-// SoftwareSerial is only supported for AVR-based boards
-// The second condition checks if the IDE is in the 1.0.x series, if so, include SoftwareSerial
+// SoftwareSerial is currently only supported for AVR-based boards and the Arduino 101
+// The third condition checks if the IDE is in the 1.0.x series, if so, include SoftwareSerial
 // since it should be available to all boards in that IDE.
-#if defined(ARDUINO_ARCH_AVR) || (ARDUINO >= 100 && ARDUINO < 10500)
+#if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_ARC32) || (ARDUINO >= 100 && ARDUINO < 10500)
 #include <SoftwareSerial.h>
 #endif
 #include "utility/serialUtils.h"
@@ -59,6 +59,9 @@
 #define I2C_STOP_READING            B00011000
 #define I2C_READ_WRITE_MODE_MASK    B00011000
 #define I2C_10BIT_ADDRESS_MODE_MASK B00100000
+#define I2C_END_TX_MASK             B01000000
+#define I2C_STOP_TX                 1
+#define I2C_RESTART_TX              0
 #define I2C_MAX_QUERIES             8
 #define I2C_REGISTER_NOT_SPECIFIED  -1
 
@@ -102,6 +105,7 @@ struct i2c_device_info {
   byte addr;
   int reg;
   byte bytes;
+  byte stopTX;
 };
 
 /* for i2c read continuous more */
@@ -280,14 +284,14 @@ void detachServo(byte pin)
   servoPinMap[pin] = 255;
 }
 
-void readAndReportData(byte address, int theRegister, byte numBytes) {
+void readAndReportData(byte address, int theRegister, byte numBytes, byte stopTX) {
   // allow I2C requests that don't require a register read
   // for example, some devices using an interrupt pin to signify new data available
   // do not always require the register read so upon interrupt you call Wire.requestFrom()
   if (theRegister != I2C_REGISTER_NOT_SPECIFIED) {
     Wire.beginTransmission(address);
     wireWrite((byte)theRegister);
-    Wire.endTransmission();
+    Wire.endTransmission(stopTX); // default = true
     // do not set a value of 0
     if (i2cReadDelayTime > 0) {
       // delay is necessary for some devices such as WiiNunchuck
@@ -573,6 +577,7 @@ void reportDigitalCallback(byte port, int value)
 void sysexCallback(byte command, byte argc, byte *argv)
 {
   byte mode;
+  byte stopTX;
   byte slaveAddress;
   byte data;
   int slaveRegister;
@@ -587,6 +592,15 @@ void sysexCallback(byte command, byte argc, byte *argv)
       }
       else {
         slaveAddress = argv[0];
+      }
+
+      // need to invert the logic here since 0 will be default for client
+      // libraries that have not updated to add support for restart tx
+      if (argv[1] & I2C_END_TX_MASK) {
+        stopTX = I2C_RESTART_TX;
+      }
+      else {
+        stopTX = I2C_STOP_TX; // default
       }
 
       switch (mode) {
@@ -610,7 +624,7 @@ void sysexCallback(byte command, byte argc, byte *argv)
             slaveRegister = I2C_REGISTER_NOT_SPECIFIED;
             data = argv[2] + (argv[3] << 7);  // bytes to read
           }
-          readAndReportData(slaveAddress, (int)slaveRegister, data);
+          readAndReportData(slaveAddress, (int)slaveRegister, data, stopTX);
           break;
         case I2C_READ_CONTINUOUSLY:
           if ((queryIndex + 1) >= I2C_MAX_QUERIES) {
@@ -632,6 +646,7 @@ void sysexCallback(byte command, byte argc, byte *argv)
           query[queryIndex].addr = slaveAddress;
           query[queryIndex].reg = slaveRegister;
           query[queryIndex].bytes = data;
+          query[queryIndex].stopTX = stopTX;
           break;
         case I2C_STOP_READING:
           byte queryIndexToSkip;
@@ -640,6 +655,7 @@ void sysexCallback(byte command, byte argc, byte *argv)
           if (queryIndex <= 0) {
             queryIndex = -1;
           } else {
+            queryIndexToSkip = 0;
             // if read continuous mode is enabled for multiple devices,
             // determine which device to stop reading and remove it's data from
             // the array, shifiting other array data to fill the space
@@ -655,6 +671,7 @@ void sysexCallback(byte command, byte argc, byte *argv)
                 query[i].addr = query[i + 1].addr;
                 query[i].reg = query[i + 1].reg;
                 query[i].bytes = query[i + 1].bytes;
+                query[i].stopTX = query[i + 1].stopTX;
               }
             }
             queryIndex--;
@@ -779,13 +796,8 @@ void sysexCallback(byte command, byte argc, byte *argv)
         case SERIAL_CONFIG:
           {
             long baud = (long)argv[1] | ((long)argv[2] << 7) | ((long)argv[3] << 14);
-            byte txPin, rxPin;
+            byte swTxPin, swRxPin;
             serial_pins pins;
-
-            if (portId > 7 && argc > 4) {
-              rxPin = argv[4];
-              txPin = argv[5];
-            }
 
             if (portId < 8) {
               serialPort = getPortFromId(portId);
@@ -802,32 +814,40 @@ void sysexCallback(byte command, byte argc, byte *argv)
               }
             } else {
 #if defined(SoftwareSerial_h)
+              if (argc > 4) {
+                swRxPin = argv[4];
+                swTxPin = argv[5];
+              } else {
+                // RX and TX pins must be specified when using SW serial
+                Firmata.sendString("Specify serial RX and TX pins");
+                return;
+              }
               switch (portId) {
                 case SW_SERIAL0:
                   if (swSerial0 == NULL) {
-                    swSerial0 = new SoftwareSerial(rxPin, txPin);
+                    swSerial0 = new SoftwareSerial(swRxPin, swTxPin);
                   }
                   break;
                 case SW_SERIAL1:
                   if (swSerial1 == NULL) {
-                    swSerial1 = new SoftwareSerial(rxPin, txPin);
+                    swSerial1 = new SoftwareSerial(swRxPin, swTxPin);
                   }
                   break;
                 case SW_SERIAL2:
                   if (swSerial2 == NULL) {
-                    swSerial2 = new SoftwareSerial(rxPin, txPin);
+                    swSerial2 = new SoftwareSerial(swRxPin, swTxPin);
                   }
                   break;
                 case SW_SERIAL3:
                   if (swSerial3 == NULL) {
-                    swSerial3 = new SoftwareSerial(rxPin, txPin);
+                    swSerial3 = new SoftwareSerial(swRxPin, swTxPin);
                   }
                   break;
               }
               serialPort = getPortFromId(portId);
               if (serialPort != NULL) {
-                setPinModeCallback(rxPin, PIN_MODE_SERIAL);
-                setPinModeCallback(txPin, PIN_MODE_SERIAL);
+                setPinModeCallback(swRxPin, PIN_MODE_SERIAL);
+                setPinModeCallback(swTxPin, PIN_MODE_SERIAL);
                 ((SoftwareSerial*)serialPort)->begin(baud);
               }
 #endif
@@ -863,7 +883,7 @@ void sysexCallback(byte command, byte argc, byte *argv)
             serialIndex++;
             reportSerial[serialIndex] = portId;
           } else if (argv[1] == SERIAL_STOP_READING) {
-            byte serialIndexToSkip;
+            byte serialIndexToSkip = 0;
             if (serialIndex <= 0) {
               serialIndex = -1;
             } else {
@@ -1016,7 +1036,7 @@ void systemResetCallback()
 
 void setup()
 {
-  Firmata.setFirmwareVersion(FIRMATA_MAJOR_VERSION, FIRMATA_MINOR_VERSION);
+  Firmata.setFirmwareVersion(FIRMATA_FIRMWARE_MAJOR_VERSION, FIRMATA_FIRMWARE_MINOR_VERSION);
 
   Firmata.attach(ANALOG_MESSAGE, analogWriteCallback);
   Firmata.attach(DIGITAL_MESSAGE, digitalWriteCallback);
@@ -1035,7 +1055,7 @@ void setup()
 
   Firmata.begin(57600);
   while (!Serial) {
-    ; // wait for serial port to connect. Only needed for ATmega32u4-based boards (Leonardo, etc).
+    ; // wait for serial port to connect. Needed for ATmega32u4-based boards and Arduino 101
   }
   systemResetCallback();  // reset to default config
 }
@@ -1073,7 +1093,7 @@ void loop()
     // report i2c data for all device with read continuous mode enabled
     if (queryIndex > -1) {
       for (byte i = 0; i < queryIndex + 1; i++) {
-        readAndReportData(query[i].addr, query[i].reg, query[i].bytes);
+        readAndReportData(query[i].addr, query[i].reg, query[i].bytes, query[i].stopTX);
       }
     }
   }

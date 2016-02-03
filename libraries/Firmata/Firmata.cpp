@@ -1,6 +1,7 @@
 /*
-  Firmata.cpp - Firmata library v2.5.0 - 2015-11-7
+  Firmata.cpp - Firmata library v2.5.1 - 2015-12-26
   Copyright (c) 2006-2008 Hans-Christoph Steiner.  All rights reserved.
+  Copyright (C) 2009-2015 Jeff Hoefs.  All rights reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -87,18 +88,20 @@ void FirmataClass::begin(Stream &s)
 void FirmataClass::printVersion(void)
 {
   FirmataStream->write(REPORT_VERSION);
-  FirmataStream->write(FIRMATA_MAJOR_VERSION);
-  FirmataStream->write(FIRMATA_MINOR_VERSION);
+  FirmataStream->write(FIRMATA_PROTOCOL_MAJOR_VERSION);
+  FirmataStream->write(FIRMATA_PROTOCOL_MINOR_VERSION);
 }
 
 void FirmataClass::blinkVersion(void)
 {
+#if defined(VERSION_BLINK_PIN)
   // flash the pin with the protocol version
   pinMode(VERSION_BLINK_PIN, OUTPUT);
-  strobeBlinkPin(FIRMATA_MAJOR_VERSION, 40, 210);
+  strobeBlinkPin(VERSION_BLINK_PIN, FIRMATA_FIRMWARE_MAJOR_VERSION, 40, 210);
   delay(250);
-  strobeBlinkPin(FIRMATA_MINOR_VERSION, 40, 210);
+  strobeBlinkPin(VERSION_BLINK_PIN, FIRMATA_FIRMWARE_MINOR_VERSION, 40, 210);
   delay(125);
+#endif
 }
 
 void FirmataClass::printFirmwareVersion(void)
@@ -160,7 +163,6 @@ int FirmataClass::available(void)
 {
   return FirmataStream->available();
 }
-
 
 void FirmataClass::processSysexMessage(void)
 {
@@ -330,7 +332,6 @@ void FirmataClass::sendDigitalPort(byte portNumber, int portData)
   FirmataStream->write(portData >> 7);  // Tx bits 7-13
 }
 
-
 void FirmataClass::sendSysex(byte command, byte bytec, byte *bytev)
 {
   byte i;
@@ -347,7 +348,6 @@ void FirmataClass::sendString(byte command, const char *string)
   sendSysex(command, strlen(string), (byte *)string);
 }
 
-
 // send a string as the protocol string type
 void FirmataClass::sendString(const char *string)
 {
@@ -359,7 +359,6 @@ void FirmataClass::write(byte c)
 {
   FirmataStream->write(c);
 }
-
 
 // Internal Actions/////////////////////////////////////////////////////////////
 
@@ -428,8 +427,6 @@ void FirmataClass::detach(byte command)
 //* Private Methods
 //******************************************************************************
 
-
-
 // resets the system state upon a SYSTEM_RESET message from the host software
 void FirmataClass::systemReset(void)
 {
@@ -450,22 +447,18 @@ void FirmataClass::systemReset(void)
     (*currentSystemResetCallback)();
 }
 
-
-
 // =============================================================================
 // used for flashing the pin for the version number
-void FirmataClass::strobeBlinkPin(int count, int onInterval, int offInterval)
+void FirmataClass::strobeBlinkPin(byte pin, int count, int onInterval, int offInterval)
 {
   byte i;
-  pinMode(VERSION_BLINK_PIN, OUTPUT);
   for (i = 0; i < count; i++) {
     delay(offInterval);
-    digitalWrite(VERSION_BLINK_PIN, HIGH);
+    digitalWrite(pin, HIGH);
     delay(onInterval);
-    digitalWrite(VERSION_BLINK_PIN, LOW);
+    digitalWrite(pin, LOW);
   }
 }
-
 
 // make one instance for the user to use
 FirmataClass Firmata;
