@@ -1,9 +1,11 @@
 #include <pitches.h>
+#include <LiquidCrystal.h>
 
 // Constant variables
 const int speaker = 2;
-const int trigPin = 4;
-const int echoPin = 3;
+const int trigPin = 7;
+const int echoPin = 8;
+LiquidCrystal LCD(4, 6, 10, 11, 12, 13);
 
 // Variables
 
@@ -38,6 +40,8 @@ void setup() {
 	pinMode(speaker, OUTPUT);
 	pinMode(trigPin, OUTPUT);
 	pinMode(echoPin, INPUT);
+	LCD.begin(16, 2);
+	LCDWriteText("HELLO");
 	Serial.begin(9600);
 	for(int i = 0; i < 5; i++) {
 		five[i] = 0;
@@ -80,4 +84,17 @@ void playNote(int note) {
 	//delay(1000 / length * 1.3);
 	//noTone(speaker);
 	lastNote = note;
+	LCDWriteNote(note);
+}
+
+void LCDWriteText(char text[]) {
+	LCD.clear();
+	LCD.setCursor(0, 0);
+	LCD.print(text);
+}
+
+void LCDWriteNote(int note) {
+	LCD.clear();
+	LCD.setCursor(0, 0);
+	LCD.print(note);
 }
