@@ -388,7 +388,208 @@ void loop() {
 	delay(eighth);
 	/*16*/
 
+	playAndSend(C6, 0);
+	delay(eighth);
 
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(G5, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(B4, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(G5, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+	/*17*/
+
+	playAndSend(AS4, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(G5, 0);
+	delay(eighth);
+
+	playAndSend(AS5, 0);
+	delay(eighth);
+
+	playAndSend(A5, 0);
+	delay(eighth);
+
+	playAndSend(G5, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(C5, 0);
+	delay(eighth);
+	/*18*/
+
+	playAndSend(C6, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(G5, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(B4, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(G5, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+	/*19*/
+
+	playAndSend(AS4, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(G5, 0);
+	delay(eighth);
+
+	playAndSend(AS5, 0);
+	delay(eighth);
+
+	playAndSend(A5, 0);
+	delay(eighth);
+
+	playAndSend(G5, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(C5, 0);
+	delay(eighth);
+	/*18*/
+
+	playAndSend(C6, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(G5, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(B4, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(G5, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+	/*20*/
+
+	playAndSend(AS4, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(G5, 0);
+	delay(eighth);
+
+	playAndSend(AS5, 0);
+	delay(eighth);
+
+	playAndSend(A5, 0);
+	delay(eighth);
+
+	playAndSend(G5, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(C5, 0);
+	delay(eighth);
+	/*21*/
+
+	playAndSend(C6, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(G5, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(B4, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(G5, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+	/*22*/
+
+	playAndSend(AS4, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(G5, 0);
+	delay(eighth);
+
+	playAndSend(AS5, 0);
+	delay(eighth);
+
+	playAndSend(A5, 0);
+	delay(eighth);
+
+	playAndSend(G5, 0);
+	delay(eighth);
+
+	playAndSend(F5, 0);
+	delay(eighth);
+
+	playAndSend(C5, 0);
+	delay(eighth);
+	/*23*/
+
+	playAndSend(0, 0);
+	delay(1000);
 }
 
 void playSpeaker(unsigned int note, unsigned int length) {
