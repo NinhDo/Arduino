@@ -182,7 +182,7 @@ void loop() {
 	delay(thirthysecond);
 	/*8*/
 
-	playAndSend(C4, A2); //????
+	playAndSend(C4, AS2); //????
 	delay(eighth);
 
 	playAndSend(0, F3, false, true);
@@ -194,7 +194,7 @@ void loop() {
 	playAndSend(A4, F3);
 	delay(eighth);
 
-	playAndSend(G4, A2); //????
+	playAndSend(G4, AS2); //????
 	delay(eighth);
 
 	playAndSend(F4, F3);
@@ -207,7 +207,7 @@ void loop() {
 	delay(eighth);
 	/*9*/
 
-	playAndSend(G4, G2); //????
+	playAndSend(G4, A2); //????
 	delay(eighth);
 
 	playAndSend(0, F3, false, true);
@@ -222,7 +222,7 @@ void loop() {
 	playAndSend(D5, 0, true, false);
 	delay(sixteenth);
 
-	playAndSend(C5, FS2); //????
+	playAndSend(C5, GS2); //????
 	delay(eighth);
 
 	playAndSend(0, F3, false, true);
@@ -235,82 +235,82 @@ void loop() {
 	delay(eighth);
 	/*10*/
 
-	playAndSend(D4, 0);
+	playAndSend(D4, G2);
 	delay(eighth);
 
-	playAndSend(0, 0, false, true);
+	playAndSend(0, F3, false, true);
 	delay(eighth);
 
-	playAndSend(C5, 0);
+	playAndSend(C5, G3);
 	delay(eighth);
 
-	playAndSend(A4, 0);
+	playAndSend(A4, F3);
 	delay(eighth);
 
-	playAndSend(G4, 0);
+	playAndSend(G4, C3);
 	delay(eighth);
 
-	playAndSend(F4, 0);
+	playAndSend(F4, F3);
 	delay(eighth);
 
-	playAndSend(G4, 0);
+	playAndSend(G4, G3);
 	delay(eighth);
 
-	playAndSend(A4, 0);
+	playAndSend(A4, F3);
 	delay(eighth);
 	/*11*/
 
-	playAndSend(E4, 0);
+	playAndSend(E4, A2);
 	delay(eighth);
 
-	playAndSend(0, 0, false, true);
+	playAndSend(0, F3, false, true);
 	delay(eighth);
 
-	playAndSend(G4, 0);
+	playAndSend(G4, G3);
 	delay(eighth);
 
-	playAndSend(0, 0);
+	playAndSend(0, F3);
 	delay(eighth);
 
-	playAndSend(G4, 0);
+	playAndSend(G4, D3);
 	delay(eighth);
 
-	playAndSend(F4, 0);
+	playAndSend(F4, D3);
 	delay(eighth);
 
-	playAndSend(E4, 0);
+	playAndSend(E4, C3);
 	delay(eighth);
 
-	playAndSend(F4, 0);
+	playAndSend(F4, C3);
 	delay(eighth);
 	/*12*/
 
-	playAndSend(C4, 0);
+	playAndSend(C4, AS2);
 	delay(eighth);
 
-	playAndSend(0, 0, false, true);
+	playAndSend(0, F3, false, true);
 	delay(eighth);
 
-	playAndSend(C5, 0);
+	playAndSend(C5, G3);
 	delay(eighth);
 
-	playAndSend(A4, 0);
+	playAndSend(A4, F3);
 	delay(eighth);
 
-	playAndSend(G4, 0);
+	playAndSend(G4, AS2);
 	delay(eighth);
 
-	playAndSend(F4, 0);
+	playAndSend(F4, F3);
 	delay(eighth);
 
-	playAndSend(E4, 0);
+	playAndSend(E4, G3);
 	delay(eighth);
 
-	playAndSend(F4, 0);
+	playAndSend(F4, F3);
 	delay(eighth);
 	/*13*/
 
-	playAndSend(G4, G2); //????
+	playAndSend(G4, A2); //????
 	delay(eighth);
 
 	playAndSend(0, F3, false, true);
